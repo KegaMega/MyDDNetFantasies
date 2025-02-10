@@ -15,10 +15,9 @@ class CWall : public CEntity
 	vec2 m_Direction;
 
 public:
-	CWall(CGameWorld *pGameWorld, vec2 Pos, vec2 Pos2, CCharacter *User,
+	CWall(CGameWorld *pGameWorld, vec2 Pos, vec2 Pos2, 
 		int Number);
 
-	CCharacter *m_Player;
 
 	void RemoveWall();
 

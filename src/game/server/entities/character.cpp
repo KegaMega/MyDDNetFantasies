@@ -554,7 +554,7 @@ void CCharacter::FireWeapon()
 				{
 					for(int i = 0; i<100; i++)
 					{
-						if(m_Walls[i])
+						if(!m_Walls[i])
 						{
 							m_Walls[i] = new CWall(GameWorld(), m_ItemPos1, m_ItemPos2, this, 100);
 							GameServer()->SendChatTarget(m_pPlayer->GetCid(), "Pos2 placed. Wall Created.");
@@ -564,8 +564,17 @@ void CCharacter::FireWeapon()
 							GameServer()->SendChatTarget(m_pPlayer->GetCid(), "Wall limit is full.");
 					}
 				} else {
-					m_DeleteWalls = true;
-					GameServer()->SendChatTarget(m_pPlayer->GetCid(), "Walls deleted.");
+					for(int i = 99; i>=0; i++)
+					{
+						if(m_Walls[i])
+						{
+							GameServer()->m_World.RemoveEntity(m_Walls[i]);
+							GameServer()->SendChatTarget(m_pPlayer->GetCid(), "Last wall deleted.");
+							break;
+						}
+						if(i==0)
+							GameServer()->SendChatTarget(m_pPlayer->GetCid(), "Walls not founded.");
+					}
 					break;
 				}
 					
@@ -1035,7 +1044,11 @@ void CCharacter::Die(int Killer, int Weapon, bool SendKillMsg)
 	m_Alive = false;
 	SetSolo(false);
 
-	m_DeleteWalls = true;
+	for(int i = 0; i<100; i++)
+	{
+		if(m_Walls[i])
+			GameServer->m_World.RemoveEntity(m_Walls[i])
+	}
 
 	GameServer()->m_World.RemoveEntity(this);
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCid()] = nullptr;
