@@ -1047,7 +1047,7 @@ void CCharacter::Die(int Killer, int Weapon, bool SendKillMsg)
 	for(int i = 0; i<100; i++)
 	{
 		if(m_Walls[i])
-			GameServer->m_World.RemoveEntity(m_Walls[i])
+			GameServer()->m_World.RemoveEntity(m_Walls[i])
 	}
 
 	GameServer()->m_World.RemoveEntity(this);
