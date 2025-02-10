@@ -9,7 +9,7 @@
 #include <game/server/gamecontext.h>
 #include <game/server/player.h>
 
-CWall::CWall(CGameWorld *pGameWorld, vec2 Pos, vec2 Pos2, CCharacter User, 
+CWall::CWall(CGameWorld *pGameWorld, vec2 Pos, vec2 Pos2, CCharacter *User, 
 	int Number) :
 	CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
