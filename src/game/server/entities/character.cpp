@@ -556,7 +556,7 @@ void CCharacter::FireWeapon()
 					{
 						if(!m_Walls[i])
 						{
-							m_Walls[i] = new CWall(GameWorld(), m_ItemPos1, m_ItemPos2, this, 100);
+							m_Walls[i] = new CWall(GameWorld(), m_ItemPos1, m_ItemPos2, 100);
 							GameServer()->SendChatTarget(m_pPlayer->GetCid(), "Pos2 placed. Wall Created.");
 							break;
 						}
@@ -1047,7 +1047,7 @@ void CCharacter::Die(int Killer, int Weapon, bool SendKillMsg)
 	for(int i = 0; i<100; i++)
 	{
 		if(m_Walls[i])
-			GameServer()->m_World.RemoveEntity(m_Walls[i])
+			GameServer()->m_World.RemoveEntity(m_Walls[i]);
 	}
 
 	GameServer()->m_World.RemoveEntity(this);
