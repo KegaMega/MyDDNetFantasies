@@ -17,6 +17,8 @@ public:
 	CWall(CGameWorld *pGameWorld, vec2 Pos, vec2 Pos2,
 		int Number);
 
+	bool m_IfItNeedsToDelete;
+
 	void RemoveWall();
 
 	void Reset() override;

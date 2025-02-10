@@ -40,6 +40,10 @@ void CWall::Reset()
 
 void CWall::Snap(int SnappingClient)
 {
+	if(m_IfItNeedsToDelete)
+	{
+		RemoveWall();
+	}
 	if(NetworkClipped(SnappingClient, m_Pos) && NetworkClipped(SnappingClient, m_To))
 		return;
 
