@@ -3,6 +3,7 @@
 #define GAME_SERVER_ENTITIES_WALL_H
 
 #include <game/server/entity.h>
+#include "character.h"
 
 class CGameWorld;
 
@@ -17,7 +18,7 @@ public:
 	CWall(CGameWorld *pGameWorld, vec2 Pos, vec2 Pos2,
 		int Number);
 
-	bool m_IfItNeedsToDelete;
+	CCharacter m_Player;
 
 	void RemoveWall();
 

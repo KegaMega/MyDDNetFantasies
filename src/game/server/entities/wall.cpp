@@ -9,10 +9,11 @@
 #include <game/server/gamecontext.h>
 #include <game/server/player.h>
 
-CWall::CWall(CGameWorld *pGameWorld, vec2 Pos, vec2 Pos2,
+CWall::CWall(CGameWorld *pGameWorld, vec2 Pos, vec2 Pos2, CCharacter User, 
 	int Number) :
 	CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
+	m_Player = User;
 	m_Number = Number;
 	m_Pos = Pos;
 	m_Length = distance(Pos, Pos2);
@@ -40,7 +41,7 @@ void CWall::Reset()
 
 void CWall::Snap(int SnappingClient)
 {
-	if(m_IfItNeedsToDelete)
+	if(m_Player->m_DeleteWalls)
 	{
 		RemoveWall();
 	}

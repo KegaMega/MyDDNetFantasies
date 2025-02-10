@@ -239,6 +239,7 @@ public:
 	vec2 m_ItemPos1;
 	vec2 m_ItemPos2;
 	CWall *m_Walls[100];
+	bool m_DeleteWalls;
 
 	// Setters/Getters because i don't want to modify vanilla vars access modifiers
 	int GetLastWeapon() const { return m_LastWeapon; }
