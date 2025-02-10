@@ -3,7 +3,6 @@
 #define GAME_SERVER_ENTITIES_WALL_H
 
 #include <game/server/entity.h>
-#include "character.h"
 
 class CGameWorld;
 
