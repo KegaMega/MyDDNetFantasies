@@ -541,7 +541,6 @@ void CCharacter::FireWeapon()
 			}
 		} else if(m_EditMode==1)
 		{
-			GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE, TeamMask());
 			if(m_ItemPos1==vec2(0.0f, 0.0f))
 			{
 				m_ItemPos1 = m_Pos;
@@ -582,8 +581,8 @@ void CCharacter::FireWeapon()
 				GameServer()->CreateSound(m_Pos, SOUND_GRENADE_FIRE);
 				m_ItemPos1 = vec2(0.0f, 0.0f);
 				m_ItemPos2 = vec2(0.0f, 0.0f);
-				}
 			}
+			
 		}
 		
 	}
@@ -1044,7 +1043,8 @@ void CCharacter::Die(int Killer, int Weapon, bool SendKillMsg)
 	m_Alive = false;
 	SetSolo(false);
 
-	for(int i; i<100; i++){
+	for(int i; i<100; i++)
+	{
 		if(m_Walls[i]!=nullptr)
 			m_Walls[i]->m_IfItNeedsToDelete = true;
 	}
