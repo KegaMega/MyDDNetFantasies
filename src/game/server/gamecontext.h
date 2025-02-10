@@ -526,6 +526,8 @@ private:
 
 	static void ConReloadCensorlist(IConsole::IResult *pResult, void *pUserData);
 
+	static void ConToggleEdit(IConsole::IResult *pResult, void *pUserData);
+
 	CCharacter *GetPracticeCharacter(IConsole::IResult *pResult);
 
 	enum

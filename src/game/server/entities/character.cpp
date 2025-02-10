@@ -4,6 +4,7 @@
 #include "laser.h"
 #include "pickup.h"
 #include "projectile.h"
+#include "wall.h"
 
 #include <antibot/antibot_data.h>
 
@@ -480,63 +481,95 @@ void CCharacter::FireWeapon()
 	{
 	case WEAPON_HAMMER:
 	{
-		// reset objects Hit
-		m_NumObjectsHit = 0;
-		GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE, TeamMask()); // NOLINT(clang-analyzer-unix.Malloc)
-
-		Antibot()->OnHammerFire(m_pPlayer->GetCid());
-
-		if(m_Core.m_HammerHitDisabled)
-			break;
-
-		CEntity *apEnts[MAX_CLIENTS];
-		int Hits = 0;
-		int Num = GameServer()->m_World.FindEntities(ProjStartPos, GetProximityRadius() * 0.5f, apEnts,
-			MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
-
-		for(int i = 0; i < Num; ++i)
+		if(m_EditMode==0)
 		{
-			auto *pTarget = static_cast<CCharacter *>(apEnts[i]);
+			// reset objects Hit
+			m_NumObjectsHit = 0;
+			GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE, TeamMask()); // NOLINT(clang-analyzer-unix.Malloc)
 
-			//if ((pTarget == this) || Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
-			if((pTarget == this || (pTarget->IsAlive() && !CanCollide(pTarget->GetPlayer()->GetCid()))))
-				continue;
+			Antibot()->OnHammerFire(m_pPlayer->GetCid());
 
-			// set his velocity to fast upward (for now)
-			if(length(pTarget->m_Pos - ProjStartPos) > 0.0f)
-				GameServer()->CreateHammerHit(pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f, TeamMask());
-			else
-				GameServer()->CreateHammerHit(ProjStartPos, TeamMask());
+			if(m_Core.m_HammerHitDisabled)
+				break;
 
-			vec2 Dir;
-			if(length(pTarget->m_Pos - m_Pos) > 0.0f)
-				Dir = normalize(pTarget->m_Pos - m_Pos);
-			else
-				Dir = vec2(0.f, -1.f);
+			CEntity *apEnts[MAX_CLIENTS];
+			int Hits = 0;
+			int Num = GameServer()->m_World.FindEntities(ProjStartPos, GetProximityRadius() * 0.5f, apEnts,
+				MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 
-			float Strength = GetTuning(m_TuneZone)->m_HammerStrength;
+			for(int i = 0; i < Num; ++i)
+			{
+				auto *pTarget = static_cast<CCharacter *>(apEnts[i]);
 
-			vec2 Temp = pTarget->m_Core.m_Vel + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f;
-			Temp = ClampVel(pTarget->m_MoveRestrictions, Temp);
-			Temp -= pTarget->m_Core.m_Vel;
-			pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Strength, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
-				m_pPlayer->GetCid(), m_Core.m_ActiveWeapon);
-			pTarget->UnFreeze();
+				//if ((pTarget == this) || Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
+				if((pTarget == this || (pTarget->IsAlive() && !CanCollide(pTarget->GetPlayer()->GetCid()))))
+					continue;
 
-			if(m_FreezeHammer)
-				pTarget->Freeze();
+				// set his velocity to fast upward (for now)
+				if(length(pTarget->m_Pos - ProjStartPos) > 0.0f)
+					GameServer()->CreateHammerHit(pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f, TeamMask());
+				else
+					GameServer()->CreateHammerHit(ProjStartPos, TeamMask());
 
-			Antibot()->OnHammerHit(m_pPlayer->GetCid(), pTarget->GetPlayer()->GetCid());
+				vec2 Dir;
+				if(length(pTarget->m_Pos - m_Pos) > 0.0f)
+					Dir = normalize(pTarget->m_Pos - m_Pos);
+				else
+					Dir = vec2(0.f, -1.f);
 
-			Hits++;
-		}
+				float Strength = GetTuning(m_TuneZone)->m_HammerStrength;
 
-		// if we Hit anything, we have to wait for the reload
-		if(Hits)
+				vec2 Temp = pTarget->m_Core.m_Vel + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f;
+				Temp = ClampVel(pTarget->m_MoveRestrictions, Temp);
+				Temp -= pTarget->m_Core.m_Vel;
+				pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Strength, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
+					m_pPlayer->GetCid(), m_Core.m_ActiveWeapon);
+				pTarget->UnFreeze();
+
+				if(m_FreezeHammer)
+					pTarget->Freeze();
+
+				Antibot()->OnHammerHit(m_pPlayer->GetCid(), pTarget->GetPlayer()->GetCid());
+
+				Hits++;
+			}
+			// if we Hit anything, we have to wait for the reload
+			if(Hits)
+			{
+				float FireDelay = GetTuning(m_TuneZone)->m_HammerHitFireDelay;
+				m_ReloadTimer = FireDelay * Server()->TickSpeed() / 1000;
+			}
+		} else if(m_EditMode==1)
 		{
-			float FireDelay = GetTuning(m_TuneZone)->m_HammerHitFireDelay;
-			m_ReloadTimer = FireDelay * Server()->TickSpeed() / 1000;
+			GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE, TeamMask());
+			if(m_ItemPos1==vec2(0.0f, 0.0f))
+			{
+				m_ItemPos1 = m_Pos;
+				GameServer()->SendChatTarget(m_pPlayer->GetCid(), "Pos1 placed.");
+				GameServer()->CreateHammerHit(m_Pos);
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_NINJA);
+			} else if(m_ItemPos2==vec2(0.0f, 0.0f))
+			{
+				m_ItemPos2 = m_Pos;
+				for(int i = 0; i<100; i++)
+				{
+					if(m_Walls[i]==nullptr)
+					{
+						m_Walls[i] = new CWall(GameWorld(), m_ItemPos1, m_ItemPos2, 100);
+						GameServer()->SendChatTarget(m_pPlayer->GetCid(), "Pos2 placed. Wall Created.");
+						break;
+					}
+					if(i==99)
+						GameServer()->SendChatTarget(m_pPlayer->GetCid(), "Wall limit is full.");
+				}
+				
+				GameServer()->CreateHammerHit(m_Pos);
+				GameServer()->CreateSound(m_Pos, SOUND_GRENADE_FIRE);
+				m_ItemPos1 = vec2(0.0f, 0.0f);
+				m_ItemPos2 = vec2(0.0f, 0.0f);
+			}
 		}
+		
 	}
 	break;
 

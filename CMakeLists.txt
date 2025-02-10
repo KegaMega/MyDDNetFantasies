@@ -2714,6 +2714,8 @@ if(SERVER)
     entities/character.h
     entities/door.cpp
     entities/door.h
+    entities/wall.cpp
+    entities/wall.h
     entities/dragger.cpp
     entities/dragger.h
     entities/dragger_beam.cpp

@@ -2418,3 +2418,27 @@ void CGameContext::ConTimeCP(IConsole::IResult *pResult, void *pUserData)
 	const char *pName = pResult->GetString(0);
 	pSelf->Score()->LoadPlayerTimeCp(pResult->m_ClientId, pName);
 }
+
+void CGameContext::ConToggleEdit(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	if(!CheckClientId(pResult->m_ClientId))
+		return;
+	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientId];
+	if(!pPlayer)
+		return;
+	CCharacter *pChr = pPlayer->GetCharacter();
+	if(!pChr)
+		return;
+	if(pChr->m_EditMode==0)
+	{
+		pChr->m_EditMode = 1;
+		pSelf->SendBroadcast("Edit mode enabled.", pPlayer->GetCid());
+	}
+	else if(pChr->m_EditMode==1)
+	{
+		pChr->m_EditMode = 0;
+		pSelf->SendBroadcast("Edit mode disabled.", pPlayer->GetCid());
+	}
+}
+

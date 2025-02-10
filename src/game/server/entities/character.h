@@ -5,6 +5,7 @@
 
 #include <game/server/entity.h>
 #include <game/server/save.h>
+#include "wall.h"
 
 class CGameTeams;
 class CGameWorld;
@@ -233,6 +234,11 @@ public:
 
 	int m_SpawnTick;
 	int m_WeaponChangeTick;
+
+	int m_EditMode;
+	vec2 m_ItemPos1;
+	vec2 m_ItemPos2;
+	CWall *m_Walls[100];
 
 	// Setters/Getters because i don't want to modify vanilla vars access modifiers
 	int GetLastWeapon() const { return m_LastWeapon; }
