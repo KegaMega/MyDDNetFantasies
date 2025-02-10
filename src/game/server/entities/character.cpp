@@ -550,7 +550,7 @@ void CCharacter::FireWeapon()
 			} else if(m_ItemPos2==vec2(0.0f, 0.0f))
 			{
 				m_ItemPos2 = m_Pos;
-				if(m_ItemPos1==m_ItemPos2)
+				if(m_ItemPos1!=m_ItemPos2)
 				{
 					for(int i = 0; i<100; i++)
 					{
